@@ -1,0 +1,21 @@
+success: 200
+exception: 500
+email exists error: 401
+username exists error: 402
+amka exists error: 403
+
+username does not exist 405
+wrong password 406
+
+
+
+201  its a simple user
+202 its a doctor
+203 its admin
+
+session expired 408
+
+not certif doc 409
+no free randevouz for this doc: 411
+
+no treatments for the user: 412

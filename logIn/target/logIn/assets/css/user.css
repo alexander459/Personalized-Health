@@ -1,0 +1,123 @@
+#exams-form table{
+    border-collapse: collapse;
+    background: var(--my_gray);
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+#exams-form th{
+    padding: 5px;
+    border: solid 3px white;
+}
+#exams-form td{
+    padding: 5px;
+    text-align: center;
+    border: solid 3px white;
+}
+#exams-form input{
+    text-align: center;
+}
+
+
+
+/*https://stackoverflow.com/questions/8232713/how-to-display-scroll-bar-onto-a-html-table*/
+.scroll-container{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 450px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+
+}
+.scroll-container thead th{
+    padding: 10px;
+    background: var(--my_green);
+    color: black;
+    font-size: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    border: solid 3px white;
+}
+.scroll-container table{
+    background: var(--my_gray);
+    width: 100%;
+    border-collapse: collapse;
+}
+.scroll-container table td{
+    padding: 5px;
+    text-align: center;
+    border: solid 3px white;
+}
+.scroll-container table td button{
+    width: 80px;
+    height: 40px;
+    color: white;
+    font-size: 13px;
+    border: ridge 3px;
+    background-color: darkcyan;
+}
+
+.trt-container{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/*contains the start and the end date of a treatment*/
+.trt-date-msg{
+    background-color: beige;
+    text-align: center;
+    width: 35%;
+    height: 50px;
+    border: 2px solid white;
+    border-radius: 30px;
+    font-size: 16px;
+    padding: 10px;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.trt-text{
+    overflow: auto;
+    width: 40%;
+    max-height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #9dada8;
+    color: black;
+    border: 2px solid lime;
+    border-radius: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+.trt-text p{
+    margin-top: 100px;
+    margin-left: 70px;
+    margin-right: 70px;
+    font-size: 17px;
+}
+
+/*contains docs address tel and email*/
+.doc-info-container{
+    background-color: var(--my_yellow);
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+    text-align: center;
+    padding: 20px;
+    border-radius: 20px;
+    border: none;
+}
+.doc-info-container p{
+    color: blue;
+}
