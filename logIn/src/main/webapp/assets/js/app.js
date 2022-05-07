@@ -3,15 +3,16 @@ var main;       //the main profile section
 var btnList=[];
 var msg;
 var delBtn;   //the delete user button
-var certfBtn;   //the button to certificate the doc
+var randevouz=[]    //array of randevouz objects. Stores free randevouz, booked randevouzed etc
 var rowBtnContainer;       //div that contains buttons in a row
 var columnBtnContainer;    //div that contains buttons in a column
 var userType;   //contains the status code that decodes the userType
+var exams;          //an array with all the users exams as objects
 
 /*make initializations*/
 window.addEventListener('load', ()=>{
     document.getElementById('logout-btn').addEventListener('click', logOut);
-
+    document.getElementById("guest-btn").addEventListener('click', showGuest);
     main=document.getElementById('user-profile-container');
     msg=document.createElement('div');                 //contains a msg
 
@@ -19,19 +20,15 @@ window.addEventListener('load', ()=>{
     columnBtnContainer=document.createElement('dic');
 
     delBtn=document.createElement('button');
-    certfBtn=document.createElement('button');
 
     msg.setAttribute('class', 'msg');
     rowBtnContainer.setAttribute('class', 'row-btn-container');
     columnBtnContainer.setAttribute('class', 'col-btn-container');
 
     delBtn.style.backgroundColor='red';
-    certfBtn.style.backgroundColor='var(--my_yellow)';
 
-    certfBtn.addEventListener('click', certificateDocs);
 
     delBtn.innerHTML='Delete';
-    certfBtn.innerHTML='Certify';
 
     document.getElementById('settings-btn').addEventListener('click', settings);
 });
@@ -203,8 +200,6 @@ function logIn(){
         }
     };
 
-    //params="username=admin&password=admin12*"
-   // params="username=alex&password=alex!1"
     xhr.open('POST', 'LogIn');
     xhr.send(params);
 }
@@ -230,10 +225,9 @@ function getCurrentUser(){
 }
 
 
-//updates the database using the new data from the form
+//updates the database (settings page)
 function updateData(){
     var params="";
-    var username=document.getElementById('tData_username').innerHTML;
     params=formToParams(document.getElementById('update-form'))
     const xhr = new XMLHttpRequest();
     xhr.onload=function(){
@@ -262,6 +256,120 @@ function formToParams(form){
     return params;
 }
 
-function clearForm(form){
-    form.reset();
+
+function createRandevouzTable(headers, keys, type){
+    var tHeader, tBody, tRow, tData, th, tbl, div;
+    var cancelBtn;
+    //create the table
+    //create the headers
+    tbl=document.createElement('table');
+
+    div=document.createElement('div');
+    div.setAttribute("class", 'scroll-container');
+    div.style.width='30%'
+
+    tHeader=document.createElement('thead');
+    tRow=document.createElement('tr');
+    for(var i=0; i<headers.length; i++){
+        th=document.createElement('th');
+        th.innerHTML=headers[i];
+        tRow.append(th);
+    }
+    tHeader.append(tRow);
+
+    //create the tBody
+    tBody=document.createElement('tbody');
+    for(i=0; i<randevouz.length; i++){
+        tRow=document.createElement('tr');
+        for(var j=0; j<keys.length; j++){
+            tData=document.createElement('td');
+            tData.innerHTML=(randevouz[i][keys[j]]);
+            tRow.append(tData);
+        }
+        //add the cancel randevou btn
+        tData=document.createElement('td');
+        cancelBtn=document.createElement('button');
+        cancelBtn.innerHTML="Cancel";
+        cancelBtn.setAttribute('id', 'cancelRndvz_' + randevouz[i].randevouz_id);
+        cancelBtn.addEventListener('click', cancelRandevouz);
+        tData.append(cancelBtn);
+        tRow.append(tData);
+        tBody.append(tRow);
+
+        //add done btn
+        if(type==='doc'){
+            div.style.width='50%'
+            if(randevouz[i].status=='selected') {
+                var doneBtn;
+                tData = document.createElement('td');
+                doneBtn = document.createElement('button');
+                doneBtn.innerHTML = "Done";
+                doneBtn.setAttribute('id', 'doneRndvz_' + randevouz[i].randevouz_id);
+                doneBtn.addEventListener('click', doneRandevouz);
+                tData.append(doneBtn);
+                tRow.append(tData);
+                tBody.append(tRow)
+            }
+        }
+    }
+
+
+    tbl.append(tHeader);
+    tbl.append(tBody);
+    div.append(tbl);
+    return div;
+}
+
+
+
+//show the treatment for a specific bloodtest
+function showTreatment(back){
+    var examId=event.srcElement.id.split('_')[1];
+    var div;
+    var container;
+    var h2;
+    var h3;
+    var p;
+    var backBtn;
+    getTreatment(examId, trtObj);
+
+    backBtn=setBackBtn(back);
+    rowBtnContainer.innerHTML="";
+    rowBtnContainer.append(backBtn);
+    if(trtObj===null){
+        main.innerHTML="";
+        div=document.createElement('div');
+        div.setAttribute('class', 'msg');
+        h3=document.createElement('h3');
+        h3.innerHTML="No treatment!";
+        h3.style.marginLeft='auto';
+        h3.style.marginRight='auto';
+        div.append(h3);
+
+        main.append(div);
+
+        main.append(rowBtnContainer);
+        return;
+    }
+    div=document.createElement('div');
+    container=document.createElement('div');
+    container.setAttribute('class', 'trt-container');
+    div.setAttribute('class', 'trt-date-msg');
+    h2=document.createElement('h2');
+    h2.innerHTML="Start: " + trtObj.start_date + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp End: " + trtObj.end_date;
+    p=document.createElement('p');
+    main.innerHTML="";
+    div.append(h2);
+    container.append(div);
+
+    div=document.createElement('div');
+    div.setAttribute('class', 'trt-text');
+    p.innerHTML=trtObj.treatment_text;
+    div.append(p);
+
+    container.append(div);
+    //TODO treatment css is bad
+    main.append(container);
+    main.append(rowBtnContainer);
+    trtObj=null;    //destroy
 }

@@ -3,18 +3,12 @@ var showExmsBtn;    //button to see the exams
 var viewRandevouz   //button to see the randevouz
 var findDocsBtn;    //button for finding doctors
 var viewTrtBtn;     //button for showing all the active treatments
-var exams;          //an array with all the users exams as objects
 var trtObj=[];      //contains a treatment object received from a servlet
-var randevouz=[]    //array of randevouz objects. Stores free randevouz, booked randevouzed etc
 var docsContainer;  //contains the docs as btns
-var usrBackBtn;     //the back button to navigate the users page
 var noRandevouzContainer;     //contains the msg no randevouz
 var noTrtContainer;           //contains the msg no treatments for this user
 
 window.addEventListener('load', ()=>{
-    usrBackBtn=document.createElement('button');
-    usrBackBtn.style.backgroundColor='var(--my_green)';
-    usrBackBtn.innerHTML="Back";
 
     noRandevouzContainer=document.createElement('div');
     noRandevouzContainer.setAttribute('class', 'msg-container');
@@ -60,10 +54,20 @@ function showUser(){
     loggedInUser=null;          //destroy the data after use. (for security)
 }
 
+function setBackBtn(listener){
+    var btn;
+    btn=document.createElement('button');
+    btn.innerHTML="Back";
+    btn.addEventListener('click', listener);
+    btn.style.backgroundColor='var(--my_green)';
+    return btn;
+}
+
 //shows a form and the users adds exams
 function addExams(){
-    const exmsInputNames=["test_date", "medical_center", "blood_sugar", "cholesterol", "iron", "vitamin_d3", "vitamin_b12"];
-    var examsForm=document.createElement('form');   //the form to enter the exams
+    const inputNames=["test_date", "medical_center", "blood_sugar", "cholesterol", "iron", "vitamin_d3", "vitamin_b12"];
+    var backBtn;
+    var form=document.createElement('form');   //the form to enter the exams
     var sbmtBtn=document.createElement('button');    //the submit button
     var input;
     var tbl;
@@ -71,33 +75,31 @@ function addExams(){
     var tData;
     var tHeader;
 
+    backBtn=setBackBtn(showUser);
     tbl=document.createElement('table');
-    examsForm.setAttribute('id', 'exams-form');
-    examsForm.setAttribute('onsubmit', 'postExams(); return false;');
-    sbmtBtn.setAttribute("type", "submit");
-    sbmtBtn.setAttribute("class", "submit-btn");
+    form.setAttribute('id', 'exams-form');
+    form.setAttribute('onsubmit', 'postExams(); return false;');
+    sbmtBtn.setAttribute('type', 'submit');
+    sbmtBtn.setAttribute('class', 'submit-btn');
     sbmtBtn.innerHTML="Submit";
 
-    for(var i=0; i<exmsInputNames.length; i++){
+    for(var i=0; i<inputNames.length; i++){
         tRow=document.createElement('tr');
         tHeader=document.createElement('th');
         input=document.createElement('input');
         tData=document.createElement('td');
 
-        input.setAttribute('id', 'tData_' + exmsInputNames[i]);
         input.setAttribute("required", "");
-
-        if(i>=2){       //the first 2 entries are type text. The other 5 are type number
-            input.setAttribute("type", "number");
-            input.setAttribute("step", "0.001");
-        }else if(i===0){        //if its date
-            input.setAttribute("type", "date");
+        input.setAttribute('name', inputNames[i]);
+        if(i===0){   //type date
+            input.setAttribute('type', 'date');
+        }else if(i>=2){   //type float
+            input.setAttribute('type', 'number');
+            input.setAttribute('step', '0.01');
         }
-        input.setAttribute('name', exmsInputNames[i]);
-
         tData.append(input);
 
-        tHeader.innerHTML=exmsInputNames[i];
+        tHeader.innerHTML=inputNames[i];
 
         tRow.append(tHeader);
         tRow.append(tData);
@@ -110,22 +112,18 @@ function addExams(){
     tRow.append(tHeader);
     tbl.append(tRow);
 
-    examsForm.style.marginTop='130px';
-    examsForm.append(tbl);
-
+    form.style.marginTop='130px';
+    form.append(tbl);
     main.innerHTML="";
-    main.append(examsForm);
-
-    //TODO maybe need to remove a previous listener
-    usrBackBtn.addEventListener('click', showUser);
+    main.append(form);
 
     rowBtnContainer.innerHTML="";
-    rowBtnContainer.append(usrBackBtn);
+    rowBtnContainer.append(backBtn);
 
     main.append(rowBtnContainer);
 }
 
-//displays all the exams as buttons with their date
+//displays all the exams
 function showExams(){
     var tbl;
     var tRow;
@@ -140,6 +138,7 @@ function showExams(){
     var div;
     var i;
     var trtBtn;     //the button for the treatment
+    var backBtn;
 
     getCurrentUser();
 
@@ -185,7 +184,9 @@ function showExams(){
         tData=document.createElement('td');
         trtBtn=document.createElement('button');
         trtBtn.setAttribute('id', 'treatment_' + exams[i].bloodtest_id); //the id helps to display the correct treatment
-        trtBtn.addEventListener('click', showTreatment);
+        trtBtn.addEventListener('click', ()=>{
+            showTreatment(showExams);
+        });
         trtBtn.innerHTML='Treatment';
         tData.append(trtBtn);
         tRow.append(tData);
@@ -198,9 +199,10 @@ function showExams(){
     main.innerHTML="";
     main.append(div);
 
-    usrBackBtn.addEventListener('click', showUser);
+    backBtn=setBackBtn(showUser);
+
     rowBtnContainer.innerHTML="";
-    rowBtnContainer.append(usrBackBtn);
+    rowBtnContainer.append(backBtn);
     main.append(rowBtnContainer);
 
 }
@@ -236,6 +238,9 @@ function sortExamsByDate(){
 function findDocs(){
     var i;
     var length;
+    var backBtn;
+
+    backBtn=setBackBtn(showUser);
 
     getDocs();
 
@@ -272,13 +277,47 @@ function findDocs(){
         docsContainer.style.overflow='hidden';
     }
 
-    //TODO maybe need to remove some previous listener
-    usrBackBtn.removeEventListener('click', findDocs);
-    usrBackBtn.addEventListener('click', showUser);
+
     rowBtnContainer.innerHTML="";
-    rowBtnContainer.append(usrBackBtn);
+    rowBtnContainer.append(backBtn);
     main.append(docsContainer);
     main.append(rowBtnContainer);
+}
+
+
+function showMessagePage(){
+    var index=event.srcElement.id.split('_')[1];
+    var backBtn;
+
+    backBtn=setBackBtn(displayDocsInfo);
+    backBtn.setAttribute('id', 'doc_' + index);
+
+    main.innerHTML="";
+    rowBtnContainer.innerHTML="";
+
+    var text=document.createElement('textarea');
+    var div=document.createElement('div');
+    var sendBtn=document.createElement('button');
+
+    div.setAttribute('class', 'textarea-container');
+
+    text.setAttribute('id', 'message-area');
+    text.setAttribute('cols', '50');
+    text.setAttribute('rows', '10');
+
+    sendBtn.innerHTML='Send';
+    sendBtn.style.backgroundColor='var(--my_yellow)'
+
+    sendBtn.setAttribute('id', 'doc_' + docs[index].doctor_id);
+    sendBtn.addEventListener('click', sendMessageClientToDoc);
+
+    rowBtnContainer.append(backBtn);
+    rowBtnContainer.append(sendBtn);
+
+    div.append(text);
+
+    main.append(div);
+    main.append(rowBtnContainer)
 }
 
 //displays the doctors information and randevouz to the user
@@ -288,8 +327,14 @@ function displayDocsInfo(){
     var p=document.createElement('p');
     var h2;
     var selectBtn;
+    var sendMsgBtn=document.createElement('button');        //button to send msg to doctor
+    var backBtn;
     main.innerHTML="";
 
+    sendMsgBtn.style.backgroundColor='var(--my_yellow)'
+    sendMsgBtn.innerHTML="Msg";
+    sendMsgBtn.setAttribute('id', 'doc_' + index);  //to find doctor
+    sendMsgBtn.addEventListener('click', showMessagePage);
 
     div.setAttribute('class', 'doc-info-container');
 
@@ -307,13 +352,17 @@ function displayDocsInfo(){
 
 
     rowBtnContainer.innerHTML="";
-    //TODO maybe need to remove previous listener
-    usrBackBtn.addEventListener('click', findDocs);
-    rowBtnContainer.append(usrBackBtn);
+    backBtn=setBackBtn(findDocs);
+
+    rowBtnContainer.append(backBtn);
+
+    //can send message only if the user had randevouz with the doc
+    if(canSendMsg(index)===200)
+        rowBtnContainer.append(sendMsgBtn);
 
     getFreeRandevouz(docs[index].doctor_id, randevouz);    //free randevouz now in object array randevouz
 
-    //display in text box doctors address email and tel
+    //show no randevouz message
     if(randevouz===null){
         h2=document.createElement('h2');
         h2.innerHTML="No free randevouz for this doctor!";
@@ -369,24 +418,25 @@ function displayDocsInfo(){
     main.append(rowBtnContainer);
 }
 
+
 //function displays all users randevouz
 function showUsersRandevouz(){
     var userId;
-    var h2;
-    var tHeader, tBody, tRow, tData, th, tbl, div;
-    var cancelBtn;
+    var h2, div;
     const headers=["Date", "Doctor Info", "Price", "Cancel"];
     const keys=["date_time", "doctor_info", "price"];
+    var backBtn;
+
+    backBtn=setBackBtn(showUser);
     getCurrentUser();
-    tbl=document.createElement('table');
+
     userId=loggedInUser.user_id;
     loggedInUser=null;
     randevouz=null;
     getBookedRandevouz(userId, randevouz);
     main.innerHTML="";
-    usrBackBtn.addEventListener('click', showUser);
     rowBtnContainer.innerHTML="";
-    rowBtnContainer.append(usrBackBtn);
+    rowBtnContainer.append(backBtn);
 
     if(randevouz===null || randevouz.length===0){
         h2=document.createElement('h2');
@@ -398,102 +448,12 @@ function showUsersRandevouz(){
         return;
     }
     //else display the randevouz
-    //use a table and display date doctor price and cancel btn
-    //create the table
-    //create the headers
-    tHeader=document.createElement('thead');
-    tRow=document.createElement('tr');
-    for(var i=0; i<headers.length; i++){
-        th=document.createElement('th');
-        th.innerHTML=headers[i];
-        tRow.append(th);
-    }
-    tHeader.append(tRow);
+    div=createRandevouzTable(headers, keys);
 
-    //create the tBody
-    tBody=document.createElement('tbody');
-    for(i=0; i<randevouz.length; i++){
-        tRow=document.createElement('tr');
-        for(var j=0; j<keys.length; j++){
-            tData=document.createElement('td');
-            tData.innerHTML=(randevouz[i][keys[j]]);
-            tRow.append(tData);
-        }
-        //add the select randevou btn
-        tData=document.createElement('td');
-        cancelBtn=document.createElement('button');
-        cancelBtn.innerHTML="Cancel";
-        cancelBtn.setAttribute('id', 'cancelRndvz_' + randevouz[i].randevouz_id);
-        cancelBtn.addEventListener('click', cancelRandevouz);
-        tData.append(cancelBtn);
-        tRow.append(tData);
-        tBody.append(tRow)
-    }
-
-    div=document.createElement('div');
-    div.setAttribute("class", 'scroll-container');
-    div.style.width='30%'
-
-    usrBackBtn.addEventListener('click', showUser);
-    rowBtnContainer.innerHTML="";
-    rowBtnContainer.append(usrBackBtn);
-
-    tbl.append(tHeader);
-    tbl.append(tBody);
-    div.append(tbl);
     main.append(div);
     main.append(rowBtnContainer);
 }
 
-//show the treatment for a specific bloodtest
-function showTreatment(){
-    var examId=event.srcElement.id.split('_')[1];
-    var div;
-    var container;
-    var h2;
-    var h3;
-    var p;
-    getTreatment(examId, trtObj);
-
-    usrBackBtn.removeEventListener('click', showUser);
-    usrBackBtn.addEventListener('click', showExams);
-    if(trtObj===null){
-        main.innerHTML="";
-        div=document.createElement('div');
-        div.setAttribute('class', 'msg');
-        h3=document.createElement('h3');
-        h3.innerHTML="No treatment!";
-        h3.style.marginLeft='auto';
-        h3.style.marginRight='auto';
-        div.append(h3);
-
-        main.append(div);
-
-        main.append(rowBtnContainer);
-        return;
-    }
-    div=document.createElement('div');
-    container=document.createElement('div');
-    container.setAttribute('class', 'trt-container');
-    div.setAttribute('class', 'trt-date-msg');
-    h2=document.createElement('h2');
-    h2.innerHTML="Start: " + trtObj.start_date + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp End: " + trtObj.end_date;
-    p=document.createElement('p');
-    main.innerHTML="";
-    div.append(h2);
-    container.append(div);
-
-    div=document.createElement('div');
-    div.setAttribute('class', 'trt-text');
-    p.innerHTML=trtObj.treatment_text;
-    div.append(p);
-
-    container.append(div);
-    //TODO treatment css is bad
-    main.append(container);
-    main.append(rowBtnContainer);
-    trtObj=null;    //destroy
-}
 
 //displays all the active treatments
 function showActiveTreatments(){
@@ -501,6 +461,7 @@ function showActiveTreatments(){
     var div;
     const headers=["Start", "End", "Treatment"];
     const keys=["start_date", "end_date", "treatment_text"];
+    var backBtn;
 
     tbl=document.createElement('table');
     tbl.setAttribute('border', '1px');
@@ -511,9 +472,9 @@ function showActiveTreatments(){
 
     main.innerHTML="";
     rowBtnContainer.innerHTML="";
-    //TODO maybe need to remove previous listener
-    usrBackBtn.addEventListener('click', showUser);
-    rowBtnContainer.append(usrBackBtn);
+    backBtn=setBackBtn(showUser);
+    rowBtnContainer.append(backBtn);
+
     getCurrentUser();
     getUserTreatment(loggedInUser.user_id, trtObj);
     loggedInUser=null;

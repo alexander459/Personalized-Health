@@ -4,6 +4,7 @@ var userContainer;      //contains the users and doctors buttons
 var seeUsers;           //button to display users
 var seeDocs;            //button to display doctors
 var adminsBackBtn;      //the back button to navigate the admins page
+var certfBtn;   //the button to certificate the doc
 window.addEventListener('load', ()=>{
     adminsBackBtn=document.createElement('button');
     adminsBackBtn.style.backgroundColor='var(--my_green)';
@@ -17,6 +18,11 @@ window.addEventListener('load', ()=>{
 
     seeUsers.innerHTML="Manage Users";
     seeDocs.innerHTML="Manage Doctors";
+
+    certfBtn=document.createElement('button');
+    certfBtn.addEventListener('click', certificateDocs);
+    certfBtn.style.backgroundColor='var(--my_yellow)';
+    certfBtn.innerHTML='Certify';
 
     seeUsers.addEventListener('click', ()=>{
         createUserBtnList('su');        //call the function create user list for simple users
@@ -307,6 +313,8 @@ function deleteUser(){
 
     xhr.open('GET', 'DeleteUser?username=' + uname, false);
     xhr.send();
+    createUserBtnList("su");
+
 }
 
 /*this servlet is called by the delete button and deletes the user*/
@@ -323,6 +331,7 @@ function deleteDoc(){
 
     xhr.open('GET', 'DeleteDoc?username=' + uname, false);
     xhr.send();
+    createUserBtnList("doc");
 }
 
 function certificateDocs(){

@@ -9,6 +9,37 @@
     margin: 0;
 }
 
+/*using form to sumbit bloodtests and randevouz*/
+
+form table{
+    border-collapse: collapse;
+    background: var(--my_gray);
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+form th{
+    padding: 5px;
+    border: solid 3px white;
+}
+form td{
+    padding: 5px;
+    text-align: center;
+    border: solid 3px white;
+}
+form input{
+    text-align: center;
+}
+
+.textarea-container{
+    text-align: center;
+}
+.textarea-container textarea{
+    resize: none;
+    background-color: #cbcbcb;
+    padding: 20px;
+}
+
 .msg{
     width: 100%;
     text-align: center;
@@ -21,6 +52,19 @@ button:hover{
 
 body{
     background: aqua;
+}
+
+footer{
+    padding-bottom: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 200px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    height: 100px;
 }
 
 nav{
@@ -80,6 +124,11 @@ nav button{
     justify-content: center;
     align-items: center;
 }
+#guest-link #guest-btn{
+    background-color: aqua;
+    color: blue;
+    border: none;
+}
 
 .form #logout-btn{
     display: none;
@@ -108,7 +157,6 @@ nav button{
     justify-content: space-around;
     padding: 20px;
 }
-
 .row-btn-container button{
     width: 80px;
     height: 40px;

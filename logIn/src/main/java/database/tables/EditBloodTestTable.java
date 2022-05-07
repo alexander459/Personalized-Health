@@ -46,6 +46,33 @@ public class EditBloodTestTable {
     }
 
     /**
+     * returns an arraylist with all the bloodtests of this user id
+     * @param id
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public ArrayList<BloodTest> getAllTestsByUserId(int  id) throws SQLException, ClassNotFoundException{
+        Connection con = DB_Connection.getConnection();
+        Statement stmt = con.createStatement();
+        String json;
+        ArrayList<BloodTest> btests = new ArrayList<>();
+        ResultSet rs;
+
+        rs = stmt.executeQuery("SELECT * FROM bloodtest WHERE user_id= '" + id + "'");
+        while (rs.next()){
+            json=DB_Connection.getResultsToJSON(rs);
+            Gson gson = new Gson();
+            btests.add(gson.fromJson(json, BloodTest.class));
+        }
+        stmt.close();
+        con.close();
+        return btests;
+    }
+
+
+
+    /**
      * returns an arraylist with all the bloodtests of this amka
      * @param amka
      * @return
@@ -68,6 +95,21 @@ public class EditBloodTestTable {
         stmt.close();
         con.close();
         return btests;
+    }
+
+    public BloodTest databaseToBloodTest(int id) throws SQLException, ClassNotFoundException{
+        Connection con = DB_Connection.getConnection();
+        Statement stmt = con.createStatement();
+
+        ResultSet rs;
+
+        rs = stmt.executeQuery("SELECT * FROM bloodtest WHERE bloodtest_id= '" + id + "'");
+        rs.next();
+        String json=DB_Connection.getResultsToJSON(rs);
+        Gson gson = new Gson();
+        BloodTest bt = gson.fromJson(json, BloodTest.class);
+        return bt;
+
     }
 
      public BloodTest databaseToBloodTest(String amka,String date) throws SQLException, ClassNotFoundException{

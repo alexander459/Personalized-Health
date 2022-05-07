@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mainClasses.BloodTest;
@@ -42,8 +43,41 @@ public class EditMessageTable {
         return json;
     }
 
-   
-    
+
+    /**
+     *
+     * @param id the clients id
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public ArrayList<Message> getClientsMessages(int id) throws SQLException, ClassNotFoundException{
+        Connection con = DB_Connection.getConnection();
+        Statement stmt = con.createStatement();
+        ArrayList<Message> messages = new ArrayList<>();
+
+        ResultSet rs;
+        try {
+            rs = stmt.executeQuery("SELECT * FROM message WHERE user_id= '" + id + "'");
+
+            boolean found=false;
+            while(rs.next()){
+                found=true;
+                String json=DB_Connection.getResultsToJSON(rs);
+                Gson gson = new Gson();
+                messages.add(gson.fromJson(json, Message.class));
+            }
+            if(!found)
+                return null;
+            System.out.println(messages);
+            return messages;
+        } catch (Exception e) {
+            System.err.println("Got an exception! ");
+            System.err.println(e.getMessage());
+        }
+        return null;
+    }
+
     public Message databaseToMessage(int id) throws SQLException, ClassNotFoundException{
          Connection con = DB_Connection.getConnection();
         Statement stmt = con.createStatement();
@@ -63,26 +97,6 @@ public class EditMessageTable {
         return null;
     }
 
-    public void createMessageTable() throws SQLException, ClassNotFoundException {
-        Connection con = DB_Connection.getConnection();
-        Statement stmt = con.createStatement();
-        String sql = "CREATE TABLE message "
-                + "(message_id INTEGER not NULL AUTO_INCREMENT, "
-                + "doctor_id INTEGER not null,"
-                + "user_id INTEGER not null,"
-                + "date_time TIMESTAMP not NULL, "
-                + "message VARCHAR(1000) not NULL, "
-                + "sender VARCHAR(15),"
-                + "blood_donation BOOLEAN,"
-                + "bloodtype VARCHAR(15),"
-                + "FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id), "
-                + "FOREIGN KEY (user_id) REFERENCES users(user_id), "
-                + "PRIMARY KEY ( message_id ))";
-        stmt.execute(sql);
-        stmt.close();
-        con.close();
-
-    }
 
     /**
      * Establish a database connection and add in the database.

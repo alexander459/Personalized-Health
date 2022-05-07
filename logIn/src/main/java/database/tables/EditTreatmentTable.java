@@ -43,7 +43,7 @@ public class EditTreatmentTable {
         return null;
     }
     
-    public void addTreatmentFromJSON(String json) throws ClassNotFoundException{
+    public void addTreatmentFromJSON(String json) throws ClassNotFoundException, SQLException{
          Treatment msg=jsonToTreatment(json);
          createNewTreatment(msg);
     }
@@ -59,14 +59,32 @@ public class EditTreatmentTable {
         Treatment tr = gson.fromJson(json, Treatment.class);
         return tr;
     }
-    
+
+
+    public void deleteTreatment(int id) throws SQLException, ClassNotFoundException{
+        Connection con = DB_Connection.getConnection();
+        Statement stmt = con.createStatement();
+        String query = "DELETE FROM treatment WHERE bloodtest_id='" + id + "'";
+        try {
+            stmt.executeUpdate(query);
+            stmt.close();
+            con.close();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        stmt.close();
+        con.close();
+    }
+
+
+
     public Treatment databaseToTreatment(int id) throws SQLException, ClassNotFoundException{
         Connection con = DB_Connection.getConnection();
         Statement stmt = con.createStatement();
 
         ResultSet rs;
         try {
-            rs = stmt.executeQuery("SELECT * FROM treatment WHERE treatment_id= '" + id + "'");
+            rs = stmt.executeQuery("SELECT * FROM treatment WHERE bloodtest_id= '" + id + "'");
             rs.next();
             String json=DB_Connection.getResultsToJSON(rs);
             Gson gson = new Gson();
@@ -84,32 +102,30 @@ public class EditTreatmentTable {
      *
      * @throws ClassNotFoundException
      */
-    public void createNewTreatment(Treatment tr) throws ClassNotFoundException {
-        try {
-            Connection con = DB_Connection.getConnection();
+    public void createNewTreatment(Treatment tr) throws ClassNotFoundException, SQLException {
 
-            Statement stmt = con.createStatement();
+        Connection con = DB_Connection.getConnection();
 
-            String insertQuery = "INSERT INTO "
-                    + " treatment (doctor_id,user_id,start_date,end_date,treatment_text,bloodtest_id) "
-                    + " VALUES ("
-                    + "'" + tr.getDoctor_id() + "',"
-                    + "'" + tr.getUser_id() + "',"
-                    + "'" + tr.getStart_date() + "',"
-                    + "'" + tr.getEnd_date()+ "',"
-                    + "'" + tr.getTreatment_text() + "',"
-                    + "'" + tr.getBloodtest_id()+ "'"
-                    + ")";
-            //stmt.execute(table);
-            System.out.println(insertQuery);
-            stmt.executeUpdate(insertQuery);
-            System.out.println("# The bloodtest was successfully added in the database.");
+        Statement stmt = con.createStatement();
 
-            /* Get the member id from the database and set it to the member */
-            stmt.close();
-                 con.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(EditBloodTestTable.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        String insertQuery = "INSERT INTO "
+                + " treatment (doctor_id,user_id,start_date,end_date,treatment_text,bloodtest_id) "
+                + " VALUES ("
+                + "'" + tr.getDoctor_id() + "',"
+                + "'" + tr.getUser_id() + "',"
+                + "'" + tr.getStart_date() + "',"
+                + "'" + tr.getEnd_date()+ "',"
+                + "'" + tr.getTreatment_text() + "',"
+                + "'" + tr.getBloodtest_id()+ "'"
+                + ")";
+        //stmt.execute(table);
+        System.out.println(insertQuery);
+        stmt.executeUpdate(insertQuery);
+        System.out.println("# The bloodtest was successfully added in the database.");
+
+        /* Get the member id from the database and set it to the member */
+        stmt.close();
+        con.close();
+
     }
 }

@@ -14,7 +14,7 @@ public class BookRandevou extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String rndvId = request.getParameter("randevouz_id");
         String userId = request.getParameter("user_id");
-        String userInfo = "Tel: " + request.getParameter("user_tel") + ", AMKA: " + request.getParameter("user_amka");
+        String userInfo = "Tel: " + request.getParameter("user_tel") + ", Email: " + request.getParameter("user_email") + ", AMKA: " + request.getParameter("user_amka");
         EditRandevouzTable ert = new EditRandevouzTable();
         try{
             ert.updateRandevouz(Integer.parseInt(rndvId), Integer.parseInt(userId), userInfo, "selected");

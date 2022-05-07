@@ -24,6 +24,7 @@ public class GetTreatment extends HttpServlet {
         try{
             Treatment trt = ett.databaseToTreatment(Integer.parseInt(id));
             String trtJSON = ett.treatmentToJSON(trt);
+            System.out.println(trtJSON);
             out.println(trtJSON);
         }catch (SQLException e){
             System.out.println("Exception in get treatment " + e);

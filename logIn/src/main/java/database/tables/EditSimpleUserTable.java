@@ -5,10 +5,13 @@
  */
 package database.tables;
 
+import mainClasses.Randevouz;
 import mainClasses.SimpleUser;
 import com.google.gson.Gson;
 
 import database.DB_Connection;
+import mainClasses.User;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -143,6 +146,51 @@ public class EditSimpleUserTable {
         ResultSet rs;
         try {
             rs = stmt.executeQuery("SELECT * FROM users WHERE username = '" + username + "'");
+            rs.next();
+            String json=DB_Connection.getResultsToJSON(rs);
+            Gson gson = new Gson();
+            SimpleUser user = gson.fromJson(json, SimpleUser.class);
+
+            stmt.close();
+            con.close();
+            return user;
+        } catch (Exception e) {
+            System.err.println("Got an exception in database to su! ");
+            System.err.println(e.getMessage());
+        }
+        stmt.close();
+        con.close();
+        return null;
+    }
+
+    public int getUserIdByAmka(String amka) throws SQLException, ClassNotFoundException{
+        Connection con = DB_Connection.getConnection();
+        Statement stmt = con.createStatement();
+        int id;
+        ResultSet rs;
+        try {
+            rs = stmt.executeQuery("SELECT user_id FROM users WHERE amka = '" + amka + "'");
+            rs.next();
+            id = Integer.parseInt(rs.getString("user_id"));
+            stmt.close();
+            con.close();
+            return id;
+        } catch (Exception e) {
+            System.err.println("Got an exception in database to su! ");
+            System.err.println(e.getMessage());
+        }
+        stmt.close();
+        con.close();
+        return -1;
+    }
+
+    public SimpleUser databaseToSimpleUser(int id) throws SQLException, ClassNotFoundException{
+        Connection con = DB_Connection.getConnection();
+        Statement stmt = con.createStatement();
+
+        ResultSet rs;
+        try {
+            rs = stmt.executeQuery("SELECT * FROM users WHERE user_id = '" + id + "'");
             rs.next();
             String json=DB_Connection.getResultsToJSON(rs);
             Gson gson = new Gson();
